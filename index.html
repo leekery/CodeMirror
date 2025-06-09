@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Code Editor — Snippet Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- CodeMirror CDN (Base & Modes) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material-darker.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-logo">Snippet Hub</div>
+      <div class="nav-tabs">
+        <button id="tab-editor" class="tab active">Editor</button>
+        <button id="tab-browse" class="tab">Browse</button>
+      </div>
+    </nav>
+
+    <!-- Main -->
+    <main>
+      <!-- Editor -->
+      <section id="editor-section">
+        <div class="editor-controls">
+          <input id="snippet-title" type="text" placeholder="Snippet title..." maxlength="64">
+          <select id="language-select">
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="htmlmixed">HTML</option>
+            <option value="css">CSS</option>
+            <option value="markdown">Markdown</option>
+            <option value="cpp">C++</option>
+            <option value="java">Java</option>
+            <option value="xml">XML</option>
+          </select>
+          <label class="switch">
+            <input type="checkbox" id="is-private">
+            <span class="slider"></span>
+            <span class="switch-label">Private</span>
+          </label>
+          <button id="save-snippet" class="gradient-btn">💾 Save</button>
+        </div>
+        <textarea id="code-editor">// Write your code here!</textarea>
+      </section>
+
+      <!-- Browse -->
+      <section id="browse-section" class="hidden">
+        <div class="browse-controls">
+          <input id="search-bar" type="search" placeholder="Search snippets...">
+          <select id="filter-lang">
+            <option value="">All Languages</option>
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="htmlmixed">HTML</option>
+            <option value="css">CSS</option>
+            <option value="markdown">Markdown</option>
+            <option value="cpp">C++</option>
+            <option value="java">Java</option>
+            <option value="xml">XML</option>
+          </select>
+        </div>
+        <div id="snippet-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CodeMirror & Modes -->
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/clike/clike.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
