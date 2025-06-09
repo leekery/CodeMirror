@@ -1,6 +1,7 @@
 // ======= Constants and Utility =======
 const SNIPPET_KEY = 'snippets_v2';
-const URL_HASH_PREFIX = '#s-';
+const URL_HASH_PREFIX = '#s-'; // legacy local link
+const SHARE_HASH_PREFIX = '#d-'; // data encoded in URL
 
 function randomId() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -12,6 +13,16 @@ function getNow() {
 
 function ellipsis(str, len = 200) {
   return str.length > len ? str.slice(0, len) + '…' : str;
+}
+
+function encodeSnippet(snip) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(snip))));
+}
+
+function decodeSnippet(data) {
+  try {
+    return JSON.parse(decodeURIComponent(escape(atob(data))));
+  } catch(e) { return null; }
 }
 
 // ======= Snippet Storage =======
@@ -104,12 +115,13 @@ document.getElementById('save-snippet').onclick = function() {
     created: getNow()
   };
   addSnippet(snip);
-  // If private, show link
+  let share = location.origin + location.pathname + SHARE_HASH_PREFIX + encodeSnippet(snip);
   if(isPrivate) {
-    alert("Saved! Private link: " + location.origin + location.pathname + URL_HASH_PREFIX + snip.id);
-    location.hash = URL_HASH_PREFIX + snip.id;
+    alert("Saved! Private link: " + share);
+    location.hash = SHARE_HASH_PREFIX + encodeSnippet(snip);
   } else {
-    alert("Saved to public!");
+    alert("Saved to public! Share link copied to clipboard.");
+    navigator.clipboard.writeText(share);
     switchTab('browse');
   }
   document.getElementById('snippet-title').value = '';
@@ -163,10 +175,13 @@ function viewSnippet(id) {
   codeMirror.setOption("mode", langModeMap[snip.lang] || "javascript");
   codeMirror.setValue(snip.code);
   document.getElementById('is-private').checked = snip.private;
+  history.replaceState(null, '', SHARE_HASH_PREFIX + encodeSnippet(snip));
 }
 
 function copySnippetLink(id) {
-  let url = location.origin + location.pathname + URL_HASH_PREFIX + id;
+  let snip = getSnippetById(id);
+  if(!snip) return alert('Snippet not found');
+  let url = location.origin + location.pathname + SHARE_HASH_PREFIX + encodeSnippet(snip);
   navigator.clipboard.writeText(url).then(() => {
     alert('Link copied!');
   });
@@ -178,8 +193,17 @@ document.getElementById('filter-lang').onchange = renderSnippetList;
 
 // ======= URL Hash: Private Access =======
 window.addEventListener('DOMContentLoaded', function() {
-  // If URL has #s-... show private snippet
-  if(location.hash.startsWith(URL_HASH_PREFIX)) {
+  if(location.hash.startsWith(SHARE_HASH_PREFIX)) {
+    let data = location.hash.slice(SHARE_HASH_PREFIX.length);
+    let snip = decodeSnippet(data);
+    if(!snip) return alert('Snippet not found');
+    switchTab('editor');
+    document.getElementById('snippet-title').value = snip.title;
+    document.getElementById('language-select').value = snip.lang;
+    codeMirror.setOption("mode", langModeMap[snip.lang] || "javascript");
+    codeMirror.setValue(snip.code);
+    document.getElementById('is-private').checked = snip.private;
+  } else if(location.hash.startsWith(URL_HASH_PREFIX)) {
     let id = location.hash.slice(URL_HASH_PREFIX.length);
     let snip = getSnippetById(id);
     if(!snip) return alert('Snippet not found');
